@@ -1,0 +1,169 @@
+…………………………………………………………………………………………………………………………
+Policies of Figure 6 in PonderTalk
+…………………………………………………………………………………………………………………………
+
+1. policy := root/factory/ecapolicy  create.
+         root/policy at:"TLManager" put: policy.
+         root/policy/TLManager  event:root/event/Timestamp.
+         root/policy/TLManager  condition:[true].
+         root/policy/TLManager  action:
+         [:NewVeh| root/Traffic/lightMid  IncCounter: NewVeh]. 
+
+root/policy/TLManager  active:true.
+…………………………………………………………………………………………………………………………
+
+2. policy := root/factory/ecapolicy  create.
+         root/policy at:"TLManager" put: policy.
+         root/policy/TLManager  event:root/event/ChangeTored.
+         root/policy/TLManager  condition:[:TLvcounter | TLvcounter==n].
+         root/policy/TLManager  action:
+         [:GreenTurnList| (GreenTurnList==0) ifTrue: [root/Traffic/lightMid  SwitchTheLight.
+                                 root/Traffic/lightMid  ResetCounter] ifFalse:
+                                                         [root/Traffic/lightMid TakeGTurn]]. 
+
+root/policy/TLManager  active:true.
+
+…………………………………………………………………………………………………………………………
+
+3. policy := root/factory/ecapolicy  create.
+         root/policy at:"TLManager" put: policy.
+         root/policy/TLManager  event:root/event/NoVeh.
+         root/policy/TLManager condition:[:RedSwarm :Swarm :TLColor :GreenTime | Swarm not   
+                                                  & RedSwarm & TLColor==green & GreenTime==t ].
+         root/policy/TLManager  action:
+         [root/Traffic/lightMid  SwitchTheLight]. 
+
+root/policy/TLManager  active:true.
+…………………………………………………………………………………………………………………………
+
+4. policy := root/factory/ecapolicy  create.
+         root/policy at:"TLManager" put: policy.
+         root/policy/TLManager  event:root/event/NoSwarmChange.
+         root/policy/TLManager condition:[:Swarmti :Swarmti+1 :TLColor | (Swarmti==Swarmti+1) & 
+                                           TLColor=="green"].
+         root/policy/TLManager  action:
+         [root/Traffic/lightMid  SwitchTheLight. root/Traffic/lightMid  announceCongestion]. 
+
+root/policy/TLManager  active:true.
+…………………………………………………………………………………………………………………………
+
+5. policy := root/factory/ecapolicy  create.
+         root/policy at:"TLManager" put: policy.
+         root/policy/TLManager  event:root/event/EmergencyVeh.
+         root/policy/TLManager condition:[:TLStatus :TLColor | TLStatus=="Emergency" & 
+                                           TLColor=="Red"].
+         root/policy/TLManager  action:
+         [root/Traffic/lightMid  SetEmergencyColorChange.root/Traffic/lightMid SwitchTheLight]. 
+
+root/policy/TLManager  active:true.
+…………………………………………………………………………………………………………………………
+…………………………………………………………………………………………………………………………
+Policies of the first scenario
+…………………………………………………………………………………………………………………………
+
+
+
+
+1. policy := root/factory/ecapolicy  create.
+         root/policy at:"TLManager" put: policy.
+         root/policy/TLManager  event:root/event/RedLPassing.
+         root/policy/TLManager  condition:[true].
+         root/policy/TLManager  action:
+         [:Vehid| root/Traffic/lightMid  Captureinfo: Vehid]. 
+
+root/policy/TLManager  active:true.
+…………………………………………………………………………………………………………………………
+
+2. policy := root/factory/ecapolicy  create.
+         root/policy at:"TLManager" put: policy.
+         root/policy/TLManager  event:root/event/InformPolice.
+         root/policy/TLManager  condition:[:TLPoliceAvailability | TLPoliceAvailability].
+         root/policy/TLManager  action:
+         [:Vehid| root/Traffic/lightMid  ReportVVeh: Vehid]. 
+
+root/policy/TLManager  active:true.
+…………………………………………………………………………………………………………………………
+3. policy := root/factory/ecapolicy  create.
+         root/policy at:"TLManager" put: policy.
+         root/policy/TLManager  event:root/event/InformPolice.
+         root/policy/TLManager  condition:[:TLPoliceAvailability | TLPoliceAvailability not].
+         root/policy/TLManager  action:
+         [:Vehid| root/Traffic/lightMid  InformRTcontroller: Vehid]. 
+
+root/policy/TLManager  active:true.
+…………………………………………………………………………………………………………………………
+4. policy := root/factory/ecapolicy  create.
+         root/policy at:"RTManager" put: policy.
+         root/policy/RTManager  event:root/event/RTInformPolice.
+         root/policy/RTManager  condition:[:RTPoliceAvailability | RTPoliceAvailability].
+         root/policy/RTManager  action:
+         [:Vehid| root/Traffic/regionMid  ReportVVeh: Vehid]. 
+
+root/policy/RTManager  active:true.
+…………………………………………………………………………………………………………………………
+
+5. policy := root/factory/ecapolicy  create.
+         root/policy at:"RTManager" put: policy.
+         root/policy/RTManager  event:root/event/RTInformPolice.
+         root/policy/RTManager  condition:[:RTPoliceAvailability | RTPoliceAvailability not].
+         root/policy/RTManager  action:
+         [:Vehid| root/Traffic/regionMid  InformNeighbors: Vehid]. 
+
+root/policy/RTManager  active:true.
+…………………………………………………………………………………………………………………………
+The defined policy for managing the violation
+…………………………………………………………………………………………………………………………
+policy := root/factory/ecapolicy  create.
+         root/policy at:"VManager" put: policy.
+         root/policy/VManager  event:root/event/violationhandler.
+         root/policy/VManager  condition:[:violation | violation].
+         root/policy/VManager  action:
+         [root/Traffic/vehicleMid Decreasespeed]. 
+
+root/policy/VManager  active:true.
+…………………………………………………………………………………………………………………………
+…………………………………………………………………………………………………………………………
+Policies of the second scenario
+…………………………………………………………………………………………………………………………
+
+1. policy := root/factory/ecapolicy  create.
+         root/policy at:"TLManager" put: policy.
+         root/policy/TLManager  event:root/event/TLChangeConfig.
+         root/policy/TLManager  condition:[:Congestion | Congestion].
+         root/policy/TLManager  action:
+         [root/Traffic/lightMid ChangeToCongestionConf]. 
+
+root/policy/TLManager  active:true.
+…………………………………………………………………………………………………………………………
+
+2. policy := root/factory/ecapolicy  create.
+         root/policy at:"TLManager" put: policy.
+         root/policy/TLManager  event:root/event/ReportCongestion.
+         root/policy/TLManager  condition:[:Congestion | Congestion].
+         root/policy/TLManager  action:
+         [root/Traffic/lightMid InformRTcontroller]. 
+
+root/policy/TLManager  active:true.
+…………………………………………………………………………………………………………………………
+3. policy := root/factory/ecapolicy  create.
+         root/policy at:"RTManager" put: policy.
+         root/policy/RTManager  event:root/event/RTChangeConfig.
+         root/policy/RTManager  condition:[:Congestion | Congestion].
+         root/policy/RTManager  action:
+         [root/Traffic/regionMid ChangeToCongestionConf]. 
+
+root/policy/RTManager  active:true.
+…………………………………………………………………………………………………………………………
+…………………………………………………………………………………………………………………………
+The defined policy for managing the violation
+…………………………………………………………………………………………………………………………
+policy := root/factory/ecapolicy  create.
+         root/policy at:"RTManager" put: policy.
+         root/policy/RTManager  event:root/event/violationhandler.
+         root/policy/RTManager  condition:[:violation | violation].
+         root/policy/RTManager  action:
+         [:TLid | root/Traffic/regionMid  TakeGTurn:TLid]. 
+
+root/policy/RTManager  active:true.
+…………………………………………………………………………………………………………………………
+
